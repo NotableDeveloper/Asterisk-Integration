@@ -1,0 +1,146 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 698B done
+#1 DONE 0.0s
+
+#2 [asterisk internal] load build definition from Dockerfile
+#2 transferring dockerfile: 273B done
+#2 DONE 0.0s
+
+#3 [stt internal] load build definition from Dockerfile
+#3 transferring dockerfile: 304B done
+#3 DONE 0.0s
+
+#4 [asterisk internal] load metadata for docker.io/library/ubuntu:24.04
+#4 DONE 3.7s
+
+#5 [stt internal] load metadata for docker.io/library/python:3.11-slim-bookworm
+#5 DONE 3.7s
+
+#6 [asterisk internal] load .dockerignore
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [stt internal] load .dockerignore
+#7 transferring context: 58B done
+#7 DONE 0.0s
+
+#8 [asterisk internal] load build context
+#8 transferring context: 1.61kB done
+#8 DONE 0.0s
+
+#9 [stt internal] load build context
+#9 transferring context: 209B done
+#9 DONE 0.0s
+
+#10 [stt 1/7] FROM docker.io/library/python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
+#10 resolve docker.io/library/python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89 0.0s done
+#10 sha256:0beab4d6f63e2882c3b55d62f63f096b636a69ed911759c1264af11bf0051b7b 0B / 3.18MB 0.1s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 0B / 18.21MB 0.1s
+#10 sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89 6.55kB / 6.55kB done
+#10 sha256:dabc8c628ee25179a9fcb8ab81e592938ee2bad3ffb15e64157f8fe428d5279f 1.75kB / 1.75kB done
+#10 sha256:3c50954f1f466ff97efcbe7678f38adf0401eb3ddda4966e04f5be9cd6c71aed 5.52kB / 5.52kB done
+#10 sha256:0beab4d6f63e2882c3b55d62f63f096b636a69ed911759c1264af11bf0051b7b 1.05MB / 3.18MB 1.6s
+#10 extracting sha256:0beab4d6f63e2882c3b55d62f63f096b636a69ed911759c1264af11bf0051b7b
+#10 sha256:0beab4d6f63e2882c3b55d62f63f096b636a69ed911759c1264af11bf0051b7b 3.18MB / 3.18MB 1.8s done
+#10 extracting sha256:0beab4d6f63e2882c3b55d62f63f096b636a69ed911759c1264af11bf0051b7b 0.1s done
+#10 sha256:eecf51de4b60961c1d1ab865753ddb35321669709b8fd752e2314640c848f454 0B / 249B 2.0s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 1.05MB / 18.21MB 2.1s
+#10 sha256:eecf51de4b60961c1d1ab865753ddb35321669709b8fd752e2314640c848f454 249B / 249B 2.3s done
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 2.10MB / 18.21MB 2.4s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 4.19MB / 18.21MB 2.8s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 5.24MB / 18.21MB 3.1s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 6.29MB / 18.21MB 3.3s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 7.34MB / 18.21MB 3.4s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 8.39MB / 18.21MB 3.6s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 10.49MB / 18.21MB 4.0s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 11.53MB / 18.21MB 4.3s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 12.58MB / 18.21MB 4.5s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 14.68MB / 18.21MB 4.8s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 15.73MB / 18.21MB 5.0s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 16.78MB / 18.21MB 5.2s
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 17.83MB / 18.21MB 5.3s
+#10 extracting sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f
+#10 sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 18.21MB / 18.21MB 5.4s done
+#10 extracting sha256:173739fea8c050c71ecb7a5b781873f9ee07e2d8e44a8ed9700be0ad91593f3f 0.5s done
+#10 extracting sha256:eecf51de4b60961c1d1ab865753ddb35321669709b8fd752e2314640c848f454 done
+#10 DONE 6.0s
+
+#11 [stt 2/7] WORKDIR /srv
+#11 DONE 0.1s
+
+#12 [stt 3/7] COPY requirements.txt .
+#12 DONE 0.0s
+
+#13 [asterisk 1/3] FROM docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+#13 resolve docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac 0.0s done
+#13 sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 20.97MB / 28.94MB 6.0s
+#13 sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac 6.69kB / 6.69kB done
+#13 sha256:18b33ff3829707f31ada654a963b9ee35f2e6f0241b964bd17a22a9b330cb63d 424B / 424B done
+#13 sha256:f3ff6f5009cb3b8de09d949f24109461606f626fae231a81f66ba3226c8302a6 2.07kB / 2.07kB done
+#13 sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 23.07MB / 28.94MB 6.4s
+#13 sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 26.21MB / 28.94MB 6.8s
+#13 sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 28.31MB / 28.94MB 7.2s
+#13 sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 28.94MB / 28.94MB 7.2s done
+#13 extracting sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3
+#13 extracting sha256:d5aec63251bb323f816a0f4b8a554bd84e478466a9ed1068daef07368328e9a3 0.6s done
+#13 DONE 7.9s
+
+#14 [asterisk 2/3] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends asterisk curl ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 ...
+
+#15 [stt 4/7] RUN pip install --no-cache-dir -r requirements.txt
+#15 1.207 Collecting fastapi==0.115.12 (from -r requirements.txt (line 1))
+#15 1.307   Downloading fastapi-0.115.12-py3-none-any.whl.metadata (27 kB)
+#15 1.368 Collecting uvicorn==0.34.2 (from uvicorn[standard]==0.34.2->-r requirements.txt (line 2))
+#15 1.387   Downloading uvicorn-0.34.2-py3-none-any.whl.metadata (6.5 kB)
+#15 2.036 Collecting aiohttp==3.12.15 (from -r requirements.txt (line 3))
+#15 2.057   Downloading aiohttp-3.12.15-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (7.7 kB)
+#15 2.316 Collecting numpy==2.2.6 (from -r requirements.txt (line 4))
+#15 2.350   Downloading numpy-2.2.6-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (63 kB)
+#15 2.358      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 63.4/63.4 kB 15.6 MB/s eta 0:00:00
+#15 2.476 ERROR: Ignored the following versions that require a different python version: 1.21.2 Requires-Python >=3.7,<3.11; 1.21.3 Requires-Python >=3.7,<3.11; 1.21.4 Requires-Python >=3.7,<3.11; 1.21.5 Requires-Python >=3.7,<3.11; 1.21.6 Requires-Python >=3.7,<3.11; 2.5.0 Requires-Python >=3.12; 2.5.0rc1 Requires-Python >=3.12; 2.5.1 Requires-Python >=3.12; 2.5.2 Requires-Python >=3.12; 2.5.3 Requires-Python >=3.12; 2.5.4 Requires-Python >=3.12
+#15 2.476 ERROR: Could not find a version that satisfies the requirement sherpa-onnx==1.12.14 (from versions: 1.8.11, 1.9.30, 1.10.45, 1.10.46, 1.12.26, 1.12.27, 1.12.28, 1.12.29, 1.12.30, 1.12.31, 1.12.32, 1.12.33, 1.12.34, 1.12.35, 1.12.36, 1.12.37, 1.12.38, 1.12.39, 1.12.40, 1.13.0, 1.13.1, 1.13.2, 1.13.3, 1.13.4, 1.13.5, 1.13.6, 1.13.7, 1.13.8)
+#15 2.476 ERROR: No matching distribution found for sherpa-onnx==1.12.14
+#15 2.602 
+#15 2.602 [notice] A new release of pip is available: 24.0 -> 26.2.1
+#15 2.602 [notice] To update, run: pip install --upgrade pip
+#15 ERROR: process "/bin/sh -c pip install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+
+#14 [asterisk 2/3] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends asterisk curl ca-certificates && rm -rf /var/lib/apt/lists/*
+#14 0.814 Get:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease [256 kB]
+#14 CANCELED
+------
+ > [stt 4/7] RUN pip install --no-cache-dir -r requirements.txt:
+2.057   Downloading aiohttp-3.12.15-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (7.7 kB)
+2.316 Collecting numpy==2.2.6 (from -r requirements.txt (line 4))
+2.350   Downloading numpy-2.2.6-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (63 kB)
+2.358      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 63.4/63.4 kB 15.6 MB/s eta 0:00:00
+2.476 ERROR: Ignored the following versions that require a different python version: 1.21.2 Requires-Python >=3.7,<3.11; 1.21.3 Requires-Python >=3.7,<3.11; 1.21.4 Requires-Python >=3.7,<3.11; 1.21.5 Requires-Python >=3.7,<3.11; 1.21.6 Requires-Python >=3.7,<3.11; 2.5.0 Requires-Python >=3.12; 2.5.0rc1 Requires-Python >=3.12; 2.5.1 Requires-Python >=3.12; 2.5.2 Requires-Python >=3.12; 2.5.3 Requires-Python >=3.12; 2.5.4 Requires-Python >=3.12
+2.476 ERROR: Could not find a version that satisfies the requirement sherpa-onnx==1.12.14 (from versions: 1.8.11, 1.9.30, 1.10.45, 1.10.46, 1.12.26, 1.12.27, 1.12.28, 1.12.29, 1.12.30, 1.12.31, 1.12.32, 1.12.33, 1.12.34, 1.12.35, 1.12.36, 1.12.37, 1.12.38, 1.12.39, 1.12.40, 1.13.0, 1.13.1, 1.13.2, 1.13.3, 1.13.4, 1.13.5, 1.13.6, 1.13.7, 1.13.8)
+2.476 ERROR: No matching distribution found for sherpa-onnx==1.12.14
+2.602 
+2.602 [notice] A new release of pip is available: 24.0 -> 26.2.1
+2.602 [notice] To update, run: pip install --upgrade pip
+------
+Dockerfile:4
+
+--------------------
+
+   2 |     WORKDIR /srv
+
+   3 |     COPY requirements.txt .
+
+   4 | >>> RUN pip install --no-cache-dir -r requirements.txt
+
+   5 |     COPY app ./app
+
+   6 |     COPY static ./static
+
+--------------------
+
+target stt: failed to solve: process "/bin/sh -c pip install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/yhvoic20qq0upkct9cu5ox4qy
+

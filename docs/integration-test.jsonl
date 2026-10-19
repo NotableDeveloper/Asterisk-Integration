@@ -1,0 +1,16 @@
+{"type": "call_started", "call_id": "demo-85d723a507f5403ca53a4a7453be3d33", "id": 1, "time": 1792332616.1549382}
+{"type": "metrics", "call_id": "demo-85d723a507f5403ca53a4a7453be3d33", "speaker": "customer", "packets": 274, "malformed": 0, "late": 0, "lost": 0, "overflow": 0, "audio_seconds": 5.48, "inference_seconds": 0.6, "rtf": 0.11, "id": 2, "time": 1792332621.7171285}
+{"type": "call_ended", "call_id": "demo-85d723a507f5403ca53a4a7453be3d33", "id": 3, "time": 1792332621.7171404}
+Traceback (most recent call last):
+  File "<stdin>", line 41, in <module>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "<stdin>", line 29, in main
+AssertionError: No partial recognition

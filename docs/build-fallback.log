@@ -1,0 +1,49 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 678B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 304B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim-bookworm
+#3 DONE 0.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 58B done
+#4 DONE 0.0s
+
+#5 [1/7] FROM docker.io/library/python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 12.22kB done
+#6 DONE 0.0s
+
+#7 [2/7] WORKDIR /srv
+#7 CACHED
+
+#8 [3/7] COPY requirements.txt .
+#8 CACHED
+
+#9 [4/7] RUN pip install --no-cache-dir -r requirements.txt
+#9 CACHED
+
+#10 [5/7] COPY app ./app
+#10 DONE 0.0s
+
+#11 [6/7] COPY static ./static
+#11 DONE 0.0s
+
+#12 [7/7] RUN useradd --create-home app
+#12 DONE 0.1s
+
+#13 exporting to image
+#13 exporting layers 0.0s done
+#13 writing image sha256:6978540c1efe995d754d71a0bc9feba91e969be183aa04cec698988cd826dba6 done
+#13 naming to docker.io/library/local-agent-assist-stt done
+#13 DONE 0.0s
+
+#14 resolving provenance for metadata file
+#14 DONE 0.0s
+ stt  Built

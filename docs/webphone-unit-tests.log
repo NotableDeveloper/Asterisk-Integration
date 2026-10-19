@@ -1,0 +1,17 @@
+test_internal_channels_do_not_recurse (test_ari.ARITests.test_internal_channels_do_not_recurse) ... ok
+test_microphone_rx_and_silence_without_peer (test_ari.ARITests.test_microphone_rx_and_silence_without_peer) ... ok
+test_partial_setup_resources_are_owned (test_ari.ARITests.test_partial_setup_resources_are_owned) ... Could not delete channel snoop-90b6968e544343a39f57724a224720bd
+Could not delete channel media-2ed13f8497d840fbb5173202f861dcc8
+Could not delete bridge tap-d8f55ed467aa40fb94ed3a46ca6a16dc
+ok
+test_speakers_are_isolated_and_cleanup_is_idempotent (test_ari.ARITests.test_speakers_are_isolated_and_cleanup_is_idempotent) ... ok
+test_csrc_extension_padding (test_rtp.RTPTests.test_csrc_extension_padding) ... ok
+test_malformed_and_ssrc (test_rtp.RTPTests.test_malformed_and_ssrc) ... ok
+test_pcmu_known_values (test_rtp.RTPTests.test_pcmu_known_values) ... ok
+test_rejects_invalid (test_rtp.RTPTests.test_rejects_invalid) ... ok
+test_wrap_loss_late_and_queue_bound (test_rtp.RTPTests.test_wrap_loss_late_and_queue_bound) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.016s
+
+OK

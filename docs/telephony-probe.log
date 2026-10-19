@@ -1,0 +1,9 @@
+onnxruntime cpuid_info warning: Unknown CPU vendor. cpuinfo_vendor value: 0
+.int8.onnx 0.wav telephone= False '걔는 괜찮은 척하려구 애 쓰는 거 같았다'
+.int8.onnx 0.wav telephone= True ''
+.int8.onnx ko.wav telephone= False '생각을 하면서 살면 훨씬 편할 거야.'
+.int8.onnx ko.wav telephone= True ''
+.onnx 0.wav telephone= False '걔는 괜찮은 척하려구 애 쓰는 거 같았다'
+.onnx 0.wav telephone= True ''
+.onnx ko.wav telephone= False '뭔 생각을 하면서 살면 훨씬 편할 거야.'
+.onnx ko.wav telephone= True ''

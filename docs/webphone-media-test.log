@@ -1,0 +1,10 @@
+REGISTER: 200
+INVITE: 200
+{"type": "call_started", "call_id": "1792418531.0", "id": 1, "time": 1792418531.290199}
+{"type": "partial", "call_id": "1792418531.0", "speaker": "customer", "segment_id": 0, "text": "조금만.", "engine": "sensevoice-fallback", "id": 2, "time": 1792418534.874223}
+{"type": "partial", "call_id": "1792418531.0", "speaker": "customer", "segment_id": 0, "text": "조금만 생각을 하면서.", "engine": "sensevoice-fallback", "id": 3, "time": 1792418535.9043052}
+{"type": "partial", "call_id": "1792418531.0", "speaker": "customer", "segment_id": 0, "text": "조금만 생각을 하면서 살면 훨씬 편할.", "engine": "sensevoice-fallback", "id": 4, "time": 1792418536.970722}
+{"type": "final", "call_id": "1792418531.0", "speaker": "customer", "segment_id": 0, "text": "생각 을 하 면서 살 면 훨씬 편할 거야.", "emotion": "NEUTRAL", "acoustic_event": "Speech", "final_inference_ms": 50.1, "id": 5, "time": 1792418537.7396958}
+BYE: 200
+REGISTER: 200
+{"result": "PASS", "ice_dtls": "connected", "srtp_packets_sent": 320, "call_id": "1792418531.0"}

@@ -1,0 +1,3 @@
+CONTAINER ID   NAME                            CPU %     MEM USAGE / LIMIT     MEM %     NET I/O          BLOCK I/O     PIDS
+591858a171be   local-agent-assist-stt-1        0.23%     546.9MiB / 7.751GiB   6.89%     141kB / 10.1kB   0B / 0B       20
+25be2b143425   local-agent-assist-asterisk-1   0.81%     47.94MiB / 7.751GiB   0.60%     8.87kB / 138kB   0B / 73.7kB   79

@@ -1,0 +1,97 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 698B done
+#1 DONE 0.0s
+
+#2 [asterisk internal] load build definition from Dockerfile
+#2 transferring dockerfile: 273B done
+#2 DONE 0.0s
+
+#3 [stt internal] load build definition from Dockerfile
+#3 transferring dockerfile: 304B done
+#3 DONE 0.0s
+
+#4 [asterisk internal] load metadata for docker.io/library/ubuntu:24.04
+#4 DONE 0.7s
+
+#5 [stt internal] load metadata for docker.io/library/python:3.11-slim-bookworm
+#5 DONE 0.8s
+
+#6 [asterisk internal] load .dockerignore
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [asterisk 1/3] FROM docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+#7 DONE 0.0s
+
+#8 [asterisk internal] load build context
+#8 transferring context: 210B done
+#8 DONE 0.0s
+
+#9 [asterisk 2/3] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends asterisk curl ca-certificates && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [asterisk 3/3] COPY config/ /etc/asterisk/
+#10 CACHED
+
+#11 [asterisk] exporting to image
+#11 exporting layers done
+#11 writing image sha256:33bb40cabf71d17476604d3df8303202ba9d6bc03592f25ef09f221011d8e769 done
+#11 naming to docker.io/library/local-agent-assist-asterisk done
+#11 DONE 0.0s
+
+#12 [stt internal] load .dockerignore
+#12 transferring context: 58B done
+#12 DONE 0.0s
+
+#13 [stt 1/7] FROM docker.io/library/python:3.11-slim-bookworm@sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89
+#13 DONE 0.0s
+
+#14 [stt internal] load build context
+#14 transferring context: 12.47kB done
+#14 DONE 0.0s
+
+#15 [stt 3/7] COPY requirements.txt .
+#15 CACHED
+
+#16 [stt 2/7] WORKDIR /srv
+#16 CACHED
+
+#17 [stt 4/7] RUN pip install --no-cache-dir -r requirements.txt
+#17 CACHED
+
+#18 [asterisk] resolving provenance for metadata file
+#18 DONE 0.0s
+
+#19 [stt 5/7] COPY app ./app
+#19 DONE 0.0s
+
+#20 [stt 6/7] COPY static ./static
+#20 DONE 0.0s
+
+#21 [stt 7/7] RUN useradd --create-home app
+#21 DONE 0.2s
+
+#22 [stt] exporting to image
+#22 exporting layers 0.0s done
+#22 writing image sha256:191971cf5aef21ad9e2c29e8a3cba9f53cd37d25650b476f207ed34ea3af6fc9 done
+#22 naming to docker.io/library/local-agent-assist-stt done
+#22 DONE 0.1s
+
+#23 [stt] resolving provenance for metadata file
+#23 DONE 0.0s
+ asterisk  Built
+ stt  Built
+ Container local-agent-assist-asterisk-1  Recreate
+ Container local-agent-assist-asterisk-1  Recreated
+ Container local-agent-assist-stt-1  Recreate
+ Container local-agent-assist-stt-1  Recreated
+ Container local-agent-assist-asterisk-1  Starting
+ Container local-agent-assist-asterisk-1  Started
+ Container local-agent-assist-asterisk-1  Waiting
+ Container local-agent-assist-asterisk-1  Healthy
+ Container local-agent-assist-stt-1  Starting
+ Container local-agent-assist-stt-1  Started
+ Container local-agent-assist-asterisk-1  Waiting
+ Container local-agent-assist-stt-1  Waiting
+ Container local-agent-assist-asterisk-1  Healthy
+ Container local-agent-assist-stt-1  Healthy

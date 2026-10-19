@@ -1,0 +1,43 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 398B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 391B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/ubuntu:24.04
+#3 DONE 0.9s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 405B done
+#6 DONE 0.0s
+
+#7 [2/5] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends asterisk curl ca-certificates && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/5] COPY config/ /etc/asterisk/
+#8 DONE 0.0s
+
+#9 [4/5] COPY entrypoint.sh /entrypoint.sh
+#9 DONE 0.0s
+
+#10 [5/5] RUN cp /etc/asterisk/rtp.conf /etc/asterisk/rtp.base.conf && chmod +x /entrypoint.sh
+#10 DONE 0.1s
+
+#11 exporting to image
+#11 exporting layers 0.1s done
+#11 writing image sha256:5d2245076bb80d192af864f201ad3cee4545833f61ddc3746c722bce84ddd4a3 done
+#11 naming to docker.io/library/local-agent-assist-asterisk done
+#11 DONE 0.1s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ asterisk  Built
