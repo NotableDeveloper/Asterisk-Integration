@@ -84,3 +84,10 @@
 - 실서비스 토큰/개인키 패턴 점검에서 추가로 확인된 값은 없었으며, 설정의 기존 데모 자격 증명은 데모 구성으로 유지한다. 전체 보안 감사의 의미는 아니다.
 - STT 코드의 후행 공백 1곳만 정리했고 실행 로직은 변경하지 않았다.
 - GitHub remote 설정과 push는 수행하지 않았다. 상세 내용은 docs/GIT_HANDOFF.md.
+
+## 2026-10-19 GitHub 원격 연결 및 push 시도
+- 사용자 제공 원격: https://github.com/NotableDeveloper/Asterisk-Integration.git
+- origin으로 연결. 원격 refs 조회 결과 비어 있었고 로컬 main은 깨끗한 상태였다.
+- HTTPS `git push -u origin main`은 Invalid username or token으로 실패했다. 자격 증명 내용은 읽거나 기록하지 않았다.
+- GitHub CLI(gh)는 설치되어 있지 않다. 기존 SSH 인증도 BatchMode/StrictHostKeyChecking으로 확인했으나 Permission denied (publickey)로 실패했다.
+- 원격 내용은 변경되지 않았다. HTTPS origin은 유지하며 사용자 GitHub 인증 갱신 후 push를 재시도해야 한다.
