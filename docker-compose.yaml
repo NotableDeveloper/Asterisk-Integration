@@ -1,0 +1,40 @@
+name: local-agent-assist
+services:
+  asterisk:
+    build: ./asterisk
+    ports:
+      - "127.0.0.1:${SIP_PORT:-15060}:5060/udp"
+      - "127.0.0.1:12000-12020:12000-12020/udp"
+    volumes:
+      - ./asterisk/sounds:/usr/share/asterisk/sounds/custom:ro
+    networks: [agent-assist-net]
+    healthcheck:
+      test: ["CMD", "asterisk", "-rx", "core show uptime"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+  stt:
+    build: ./stt-server
+    init: true
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      ARI_URL: http://asterisk:8088/ari
+      ARI_USER: assist
+      ARI_PASSWORD: local-demo-ari
+      RTP_HOST: stt
+      MODEL_ROOT: /models
+    volumes:
+      - ./models:/models:ro
+    depends_on:
+      asterisk:
+        condition: service_healthy
+    networks: [agent-assist-net]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+networks:
+  agent-assist-net:
+    driver: bridge

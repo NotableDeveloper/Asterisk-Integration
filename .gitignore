@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+models/*
+!models/.gitkeep
+asterisk/sounds/*.wav
+docs/artifacts/
+
+web/node_modules/
+.venv-test/
+
+# Local OS metadata and credentials
+.DS_Store
+*.py[cod]
+.env.*
+!.env.example
