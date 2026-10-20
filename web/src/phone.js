@@ -1,14 +1,20 @@
 import { Web } from 'sip.js';
 
 const el = id => document.getElementById(id);
-let phone, registered = false, calling = false, busy = false;
-function status(text) { el('phone-status').textContent = text; }
+let phone, activeDestination, registered = false, calling = false, busy = false;
+function status(text) { el('phone-status').textContent = text; el('sip-status').textContent = text; }
 function render() {
-  el('phone-register').disabled = registered || busy || calling;
+  const supported = ['http:', 'https:'].includes(location.protocol);
+  const registration = registered ? '등록됨 · 내선 1003' : '미등록';
+  el('sip-registration-state').textContent = registration;
+  el('sip-connection-state').textContent = registration;
+  el('phone-register').disabled = !supported || registered || busy || calling;
   el('phone-unregister').disabled = !registered || busy || calling;
-  el('phone-call').disabled = !registered || busy || calling;
+  el('demo').disabled = !registered || busy || calling;
+  el('microphone-call').disabled = !registered || busy || calling;
+  el('microphone-call').title = registered ? '9998로 발신하여 마이크 음성 인식' : '상단 SIP 등록 후 사용할 수 있습니다.';
+  el('demo').title = registered ? '9999로 발신하여 한국어 샘플 듣기' : '상단 SIP 등록 후 사용할 수 있습니다.';
   el('phone-hangup').disabled = !calling;
-  el('phone-destination').disabled = busy || calling;
   el('phone-password').disabled = registered || busy || calling;
 }
 function failure(error) {
@@ -50,8 +56,8 @@ el('phone-register').onclick = async () => {
         },
         onCallCreated() { calling = true; render(); },
         onCallAnswered() {
-          busy = false; status('통화 연결됨 · 9998에서는 마이크로 말씀하세요.'); render();
-          el('phone-audio').play().catch(() => status('통화 연결됨 · 아래 재생 버튼을 눌러 음성을 들으세요.'));
+          busy = false; status(activeDestination === '9999' ? '통화 연결됨 · 한국어 샘플 듣기' : '통화 연결됨 · 마이크로 말씀하세요.'); render();
+          el('phone-audio').play().catch(() => status('통화 연결됨 · 대화록 아래 재생 버튼을 눌러 음성을 들으세요.'));
         },
         onCallHangup() { calling = false; busy = false; status(registered ? '통화 종료 · 발신 대기' : '통화 종료'); render(); },
         onCallReceived() { instance.decline().catch(failure); }
@@ -67,21 +73,24 @@ el('phone-register').onclick = async () => {
 el('phone-unregister').onclick = async () => {
   busy = true; render(); await dispose(); busy = false; status('SIP 등록 해제됨'); render();
 };
-el('phone-call').onclick = async () => {
-  if (!registered || !phone) return;
+async function call(destination) {
+  if (!registered || !phone || busy || calling) return;
   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
     status('마이크 통화는 localhost 또는 HTTPS에서 지원됩니다.'); return;
   }
+  activeDestination = destination;
   busy = true; render(); status('마이크 권한 확인 및 발신 중…');
   try {
-    await phone.call(`sip:${el('phone-destination').value}@asterisk`, undefined, {
+    await phone.call(`sip:${destination}@asterisk`, undefined, {
       requestDelegate: {onReject(response) { status(`발신 거절 (${response.message.statusCode})`); }}
     });
   } catch (error) {
     try { await phone.hangup(); } catch {}
     busy = false; calling = false; failure(error); render();
   }
-};
+}
+el('demo').onclick = () => call('9999');
+el('microphone-call').onclick = () => call('9998');
 el('phone-hangup').onclick = async () => {
   try { await phone.hangup(); } catch (error) { failure(error); }
 };
