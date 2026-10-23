@@ -46,6 +46,15 @@ class ARITests(unittest.IsolatedAsyncioTestCase):
             await self.ari.handle({'type':'StasisStart','channel':{'id':'snoop'},'args':args})
         self.assertFalse(self.requests)
 
+    async def test_unsupported_roles_are_rejected_before_audio_setup(self):
+        for role in ('demo', 'demo-local', 'unknown'):
+            await self.ari.handle({'type': 'StasisStart', 'channel': {'id': role}, 'args': [role]})
+        self.assertEqual(self.requests, [('DELETE', '/channels/' + role, {})
+                                        for role in ('demo', 'demo-local', 'unknown')])
+        self.assertFalse(self.audio.opened)
+        self.assertFalse(self.ari.calls)
+        self.assertFalse(self.events)
+
     async def test_partial_setup_resources_are_owned(self):
         call=Call('c');self.ari.calls['c']=call
         async def fail(method,path,**params): raise RuntimeError('setup failure')

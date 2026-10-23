@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Actual SIP/ICE/DTLS-SRTP test using a WAV fixture, never the host microphone.
-Run on the Mac host: .venv-test/bin/python scripts/test_webphone_media.py
+Run on the Mac host: .venv-test/bin/python scripts/test_webphone_media.py --wav /path/to/speech.wav
 Dependencies: aiortc==1.14.0, aiohttp==3.12.15.
 """
 import asyncio
@@ -18,8 +18,9 @@ from aiortc.contrib.media import MediaPlayer
 
 BASE = 'http://localhost:8000'
 parser=argparse.ArgumentParser()
-parser.add_argument('--destination', choices=['9998','9999'], default='9998')
-DEST=parser.parse_args().destination
+parser.add_argument('--wav', type=Path, required=True, help='Mono PCM16 speech WAV fixture')
+args=parser.parse_args()
+DEST='9998'
 
 def headers(message):
     return {k.lower(): v.strip() for k,v in (line.split(':',1) for line in message.split('\r\n\r\n')[0].split('\r\n')[1:] if ':' in line)}
@@ -81,9 +82,12 @@ async def main():
         receive_tasks.append(asyncio.create_task(consume()))
     with tempfile.TemporaryDirectory() as temp:
         fixture=Path(temp)/'fixture.wav'
-        with wave.open('asterisk/sounds/ko.wav') as src, wave.open(str(fixture),'wb') as out:
+        with wave.open(str(args.wav)) as src, wave.open(str(fixture),'wb') as out:
+            if src.getsampwidth() != 2 or src.getnchannels() != 1:
+                raise ValueError('Expected mono PCM16 WAV')
             out.setparams(src.getparams())
-            out.writeframes(b'\0'*32000+src.readframes(src.getnframes())+b'\0'*32000)
+            silence = b'\0' * (src.getframerate() * 2 * 2)
+            out.writeframes(silence + src.readframes(src.getnframes()) + silence)
         player=MediaPlayer(str(fixture),loop=True)
         pc.addTrack(player.audio)
         pc.getTransceivers()[0].setCodecPreferences([c for c in RTCRtpSender.getCapabilities('audio').codecs if c.mimeType=='audio/PCMU'])
@@ -111,7 +115,6 @@ async def main():
                 stats=await pc.getStats()
                 sent=sum(getattr(s,'packetsSent',0) for s in stats.values() if s.type=='outbound-rtp')
                 assert sent>0
-                if DEST=='9999':assert received['nonzero_frames']>10,received
                 await sip.request('BYE',f'sip:{DEST}@asterisk')
                 async with asyncio.timeout(10):
                     while True:

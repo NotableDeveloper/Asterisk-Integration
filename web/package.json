@@ -1,1 +1,1 @@
-{"name":"agent-assist-softphone","private":true,"type":"module","scripts":{"build":"esbuild src/phone.js --bundle --format=esm --minify --outfile=../stt-server/static/phone.js"},"dependencies":{"sip.js":"0.21.2"},"devDependencies":{"esbuild":"0.25.12"}}
+{"name":"agent-assist-softphone","private":true,"type":"module","scripts":{"build":"node build.mjs"},"dependencies":{"sip.js":"0.21.2"},"devDependencies":{"esbuild":"0.25.12"}}

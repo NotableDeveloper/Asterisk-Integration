@@ -1,5 +1,8 @@
 # 검증 결과 — 2026-10-18 (Asia/Seoul)
 
+> 과거 구현·검증 기록입니다. 2026-10-24에 한국어 샘플 통화 기능(9999 및 전용 API)을 제거했습니다. 현재 사용 절차는 README.md와 WEBPHONE.md를 따릅니다.
+
+
 ## 결과
 
 README의 모델 다운로드·Asterisk 구성·ARI/RTP·2-Pass·웹 UI 구현을 완료했고, 실제 Asterisk 샘플 통화의 통합 검증을 통과했다. 다만 지정된 Zipformer의 8kHz 전화 대역 인식이 실패하여 SenseVoice 중간 인식 보완 경로를 추가했다. 이를 native streaming 성공으로 해석하지 않는다.

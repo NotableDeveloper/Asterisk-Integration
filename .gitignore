@@ -4,7 +4,6 @@ __pycache__/
 .pytest_cache/
 models/*
 !models/.gitkeep
-asterisk/sounds/*.wav
 docs/artifacts/
 
 web/node_modules/

@@ -5,8 +5,6 @@ services:
     ports:
       - "127.0.0.1:${SIP_PORT:-15060}:5060/udp"
       - "127.0.0.1:12000-12020:12000-12020/udp"
-    volumes:
-      - ./asterisk/sounds:/usr/share/asterisk/sounds/custom:ro
     networks: [agent-assist-net]
     healthcheck:
       test: ["CMD", "asterisk", "-rx", "core show uptime"]

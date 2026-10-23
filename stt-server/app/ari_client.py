@@ -97,6 +97,9 @@ class ARI:
             await self.request('POST', f'/bridges/{call_id}/addChannel', channel=channel_id)
             await self.attach(call, channel_id, speaker)
             return
+        if args[0] not in ('microphone', 'customer', 'agent'):
+            await self.request('DELETE', f'/channels/{channel_id}')
+            return
         if len(self.calls) >= 2:
             await self.request('DELETE', f'/channels/{channel_id}')
             return
@@ -108,14 +111,9 @@ class ARI:
         await self.request('POST', f'/channels/{channel_id}/answer')
         role = args[0]
         if role == 'microphone':
-            await self.attach(call, channel_id, 'customer', spy='in')
+            await self.attach(call, channel_id, 'customer')
             # Generate silence to keep media flowing while the browser speaks.
             await self.request('POST', f'/channels/{channel_id}/silence')
-            return
-        if role in ('demo', 'demo-local'):
-            await self.attach(call, channel_id, 'customer', spy='out' if role == 'demo' else 'in')
-            if role == 'demo':
-                await self.request('POST', f'/channels/{channel_id}/play', media='sound:custom/ko')
             return
         await self.request('POST', f'/bridges/{call.id}', type='mixing,proxy_media')
         call.bridges.add(call.id)
@@ -127,14 +125,14 @@ class ARI:
         await self.request('POST', '/channels', endpoint='PJSIP/' + args[1],
                            channelId=peer_id, app=APP, appArgs=f'peer,{call.id},{"agent" if role == "customer" else "customer"}', timeout=30)
 
-    async def attach(self, call, original, speaker, spy='in'):
+    async def attach(self, call, original, speaker):
         session = await self.audio.open(call.id, speaker)
         call.sessions.append(session)
         snoop, external, bridge = uid('snoop'), uid('media'), uid('tap')
         # Register IDs before requests so partial setup is always cleaned up.
         call.channels.update((snoop, external))
         call.bridges.add(bridge)
-        await self.request('POST', f'/channels/{original}/snoop/{snoop}', spy=spy, whisper='none', app=APP, appArgs='internal')
+        await self.request('POST', f'/channels/{original}/snoop/{snoop}', spy='in', whisper='none', app=APP, appArgs='internal')
         await self.request('POST', '/channels/externalMedia', channelId=external, app=APP,
                            external_host=f'{os.getenv("RTP_HOST", "stt")}:{session.port}',
                            format='ulaw', encapsulation='rtp', transport='udp', connection_type='client', direction='both', data='internal')
@@ -159,11 +157,3 @@ class ARI:
         for session in call.sessions:
             await self.audio.close(session)
         await self.publish(dict(type='call_ended', call_id=call_id))
-
-    async def demo(self):
-        if not self.connected:
-            raise RuntimeError('ARI is not connected')
-        channel = uid('demo')
-        await self.request('POST', '/channels', endpoint='Local/9999@sample/n', channelId=channel,
-                           app=APP, appArgs='demo-local', timeout=30, formats='ulaw')
-        return channel

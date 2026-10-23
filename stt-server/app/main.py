@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 import logging
+import math
 import os
 from pathlib import Path
 import time
@@ -49,6 +50,36 @@ class Session:
     queue: asyncio.Queue
     pipeline: Pipeline
     task: asyncio.Task | None = None
+    monitor: asyncio.Task | None = None
+    input_samples: int = 0
+    input_energy: float = 0
+    input_peak: float = 0
+
+    def observe(self, samples):
+        # Measure the decoded 8 kHz PCM actually handed to Pipeline.feed.
+        self.input_samples += samples.size
+        self.input_energy += float(np.dot(samples, samples))
+        if samples.size:
+            self.input_peak = max(self.input_peak, float(np.max(np.abs(samples))))
+
+    def report(self, previous, elapsed, final=False):
+        delta = {key: value - previous[key] for key, value in self.receiver.stats.items()}
+        rms = math.sqrt(self.input_energy / self.input_samples) if self.input_samples else 0
+        level = f'{20 * math.log10(rms):.1f}' if rms else '-inf'
+        state = ('no_input' if not self.input_samples else
+                 'digital_silence' if not self.input_peak else 'signal')
+        log.info(
+            'STT_AUDIO call_id=%s speaker=%s port=%d final=%s interval_s=%.2f '
+            'state=%s packets=%d malformed=%d late=%d lost=%d overflow=%d '
+            'input_samples=%d input_seconds=%.3f rms_dbfs=%s peak=%.6f queue=%d',
+            self.pipeline.call_id, self.pipeline.speaker, self.port, final, elapsed,
+            state, delta['packets'], delta['malformed'], delta['late'], delta['lost'],
+            delta['overflow'], self.input_samples, self.input_samples / 8000,
+            level, self.input_peak, self.queue.qsize())
+        self.input_samples = 0
+        self.input_energy = 0
+        self.input_peak = 0
+        return self.receiver.stats.copy()
 
 class Audio:
     def __init__(self, engines, executor, hub):
@@ -66,13 +97,27 @@ class Audio:
         session = Session(transport.get_extra_info('sockname')[1], transport, receiver, queue, pipeline)
         self.sessions.add(session)
         session.task = asyncio.create_task(self.worker(session))
+        session.monitor = asyncio.create_task(self.monitor(session))
         return session
+
+    async def monitor(self, session):
+        previous = dict.fromkeys(session.receiver.stats, 0)
+        last = time.monotonic()
+        while True:
+            done, _ = await asyncio.wait({session.task}, timeout=1)
+            now = time.monotonic()
+            previous = session.report(previous, now - last, final=bool(done))
+            last = now
+            if done:
+                return
 
     async def worker(self, session):
         try:
             while True:
                 samples = await session.queue.get()
                 final = samples is None
+                if not final:
+                    session.observe(samples)
                 for event in await self.infer(session.pipeline.feed, np.empty(0, dtype=np.float32) if final else samples, final):
                     await self.hub.publish(event)
                 if final:
@@ -86,6 +131,7 @@ class Audio:
         if not session.task.done():
             await session.queue.put(None)
         await session.task
+        await session.monitor
         self.sessions.discard(session)
         p = session.pipeline
         await self.hub.publish(dict(type='metrics', call_id=p.call_id, speaker=p.speaker,
@@ -115,7 +161,8 @@ app.mount('/static', StaticFiles(directory=Path(__file__).resolve().parents[1] /
 
 @app.get('/')
 async def index():
-    return FileResponse(Path(__file__).resolve().parents[1] / 'static' / 'index.html')
+    return FileResponse(Path(__file__).resolve().parents[1] / 'static' / 'index.html',
+                        headers={'Cache-Control': 'no-cache'})
 
 @app.get('/health/ready')
 async def ready():
@@ -123,15 +170,6 @@ async def ready():
     return JSONResponse({'ready': ari.connected, 'ari_connected': ari.connected,
                          'active_calls': len(ari.calls), 'audio_sessions': len(app.state.audio.sessions)},
                         status_code=200 if ari.connected else 503)
-
-@app.post('/api/demo')
-async def demo():
-    if app.state.ari.calls:
-        raise HTTPException(409, 'A call is already active')
-    try:
-        return {'call_id': await app.state.ari.demo()}
-    except RuntimeError as exc:
-        raise HTTPException(503, str(exc)) from exc
 
 @app.delete('/api/calls/{call_id}')
 async def stop(call_id: str):

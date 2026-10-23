@@ -5,11 +5,11 @@
 필수: Docker Engine/Compose, Python 3.11 이상, 모델 다운로드용 인터넷, 여유 디스크 약 3GB 이상. macOS ARM64에서 검증하며 Linux에서도 Compose bridge를 사용한다.
 
 ```sh
-cd /Users/seongjin/workspaces/STT
+cd /Users/seongjin/workspaces/Asterisk-Integration
 ./scripts/start.sh
 ```
 
-브라우저에서 http://localhost:8000 을 열고 **한국어 샘플 통화 시작**을 누른다. 최초 실행은 모델 다운로드와 이미지 빌드가 필요하다. 이후에는 `docker compose up -d --wait`만 실행한다. 모델은 모델 디렉터리에 남으므로 다시 받지 않는다.
+브라우저에서 http://localhost:8000 을 열고 **자동 SIP 등록 완료 → 통화 시작**을 누른다. 최초 실행은 모델 다운로드와 이미지 빌드가 필요하다. 이후에는 `docker compose up -d --wait`만 실행한다. 모델은 모델 디렉터리에 남으므로 다시 받지 않는다.
 
 ```sh
 docker compose ps
@@ -18,19 +18,11 @@ docker compose logs -f stt
 docker compose down
 ```
 
-`down`은 이 Compose 프로젝트의 서비스만 종료한다. 모델·샘플 파일은 유지한다. 원문 통화 오디오는 저장하지 않으며 최근 이벤트 300개는 메모리에만 보관되고 서버 재시작으로 지워진다. 테스트 스크립트의 출력에는 샘플 대화록이 포함된다.
-
-## 소프트폰 없는 실제 통합 테스트
-
-```sh
-docker compose exec -T stt python - < scripts/integration_test.py
-```
-
-이 스크립트는 WebSocket 구독 후 ARI로 Local 채널을 생성한다. Asterisk가 공식 한국어 샘플(4.61초)을 재생하고, RX snoop → 독립 bridge → ExternalMedia PCMU → UDP → soxr → Zipformer/SenseVoice → WebSocket을 검증한다. Partial, 한국어 Final, 실제 수신 패킷, 큐 초과 없음, 통화 종료 및 서버 자원 정리를 assert한다.
+`down`은 이 Compose 프로젝트의 서비스만 종료한다. 모델 파일은 유지한다. 원문 통화 오디오는 저장하지 않으며 최근 이벤트 300개는 메모리에만 보관되고 서버 재시작으로 지워진다. 테스트 스크립트의 출력에는 샘플 대화록이 포함된다.
 
 ## 웹 소프트폰
 
-별도 앱 없이 웹 화면의 **SIP 등록 → 9998 선택 → 발신 → 마이크 허용**으로 음성을 STT에 전달한다. 9999는 샘플 수신 음성을 듣는 용도다. [웹 소프트폰 가이드](WEBPHONE.md)에 설정과 검증 범위를 정리했다.
+별도 앱 없이 웹 화면의 **자동 SIP 등록 완료 → 통화 시작 → 마이크 허용**으로 음성을 STT에 전달한다. [웹 소프트폰 가이드](WEBPHONE.md)에 설정과 검증 범위를 정리했다.
 
 ## 소프트폰 2대
 
@@ -42,7 +34,7 @@ docker compose exec -T stt python - < scripts/integration_test.py
 | 데모 비밀번호 | demo-agent-1001 | demo-customer-1002 |
 | 코덱 | G.711 μ-law | G.711 μ-law |
 
-고객 1002에서 1001로 전화하고 상담원이 받는다. 두 채널의 RX를 분리하여 고객/상담원 행에 표시한다. 반대 방향 1001→1002도 지원한다. 9999는 샘플 재생 및 발신 방향 snoop이며 소프트폰에서 직접 끊는다.
+고객 1002에서 1001로 전화하고 상담원이 받는다. 두 채널의 RX를 분리하여 고객/상담원 행에 표시한다. 반대 방향 1001→1002도 지원한다.
 
 기존 환경이 5060을 사용하므로 이 프로젝트는 호스트 SIP 15060, RTP 12000–12020을 사용한다. SIP는 `SIP_PORT=5060 docker compose up -d`로 변경 가능하다. RTP 변경 시 `rtp.conf`와 Compose 매핑을 함께 변경하고 Asterisk 이미지를 재빌드한다.
 
@@ -75,10 +67,12 @@ Docker Desktop과 소프트폰의 NAT 환경에 따라 `pjsip.conf`의 transport
 
 ## 개발 검증
 
+마이크 경로의 WAV 송신 통합 테스트는 [웹 소프트폰 가이드](WEBPHONE.md)를 따른다.
+
 ```sh
 docker compose config --quiet
 docker compose run --rm --no-deps -v "$PWD/tests:/tests:ro" stt python -m unittest discover -s /tests -v
-docker compose exec -T stt python - < scripts/integration_test.py
+
 ```
 
-모델 및 샘플의 이용 조건은 원 배포처의 LICENSE/README를 확인한다. 모델 파일은 Git 추적 대상에서 제외했다. 로컬 SHA256 manifest는 다운로드 파일의 이후 변경 검사용이며 공급자의 검증된 체크섬은 아니다.
+모델 및 테스트 음원의 이용 조건은 원 배포처의 LICENSE/README를 확인한다. 모델 파일은 Git 추적 대상에서 제외했다. 로컬 SHA256 manifest는 다운로드 파일의 이후 변경 검사용이며 공급자의 검증된 체크섬은 아니다.

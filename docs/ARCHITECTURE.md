@@ -17,8 +17,7 @@ PJSIP 1002 ↔ 원본 mixing bridge ↔ PJSIP 1001
 ```
 
 - 원본 bridge에는 snoop/media 채널을 넣지 않는다. 추출 경로가 통화 믹싱을 변경하지 않도록 격리한다.
-- snoop의 `spy=in`은 원본 채널로 유입되는 음성이므로 각 전화기의 발화가 분리된다. 소프트폰 9999 샘플 Playback은 반대 방향이므로 `out`을 쓴다.
-- Local 테스트의 `/n`은 Local 채널 최적화 제거를 막는다. `;2`에서 재생된 샘플이 `;1` RX로 들어온다.
+- snoop의 `spy=in`은 원본 채널로 유입되는 음성이므로 각 전화기의 발화가 분리된다.
 - ExternalMedia의 direction=both는 ARI RTP 드라이버의 지원 방식이다. 서버는 송신하지 않아 통화에 음성을 주입하지 않는다.
 
 ## 상태 및 자원
@@ -47,7 +46,7 @@ VAD 경계마다 segment_id가 증가한다. offline 결과의 감정/event 메�
 1. INT8 전용 SenseVoice 공식 경로 사용.
 2. 동적 RTP payload type 혼선을 피하기 위해 ulaw 고정.
 3. 기존 서비스와 충돌을 피하기 위해 호스트 SIP 15060 및 RTP 12000–12020 사용.
-4. 샘플은 새 음성 합성 대신 공식 한국어 테스트 WAV 사용.
+4. 웹 소프트폰은 마이크 입력 STT 내선만 제공한다.
 5. 모델 속도·정확도에 대한 계획서 수치를 보장하지 않고 실제 측정값 기록.
 6. 금융 hotwords는 이번 데모의 필수 단계에 없으므로 기본 greedy decoder 사용. hotword 가중치를 사용하려면 modified_beam_search 및 모델의 토큰화 조건을 추가 검증해야 한다.
 
@@ -57,4 +56,4 @@ VAD 경계마다 segment_id가 증가한다. offline 결과의 감정/event 메�
 
 ## 웹 소프트폰 (2026-10-19)
 
-웹 화면의 SIP.js → 동일 Origin `/sip` 프록시 → Asterisk PJSIP WebSocket으로 SIP 신호를 전달한다. 음성은 WebRTC ICE/DTLS-SRTP로 직접 호스트 UDP 포트를 통해 Asterisk에 도착한다. 내선 1003은 webphone 컨텍스트의 9998/9999만 사용한다. 9998은 RX 마이크 STT, 9999는 TX 샘플 STT이다. 상세 설정과 검증은 [WEBPHONE.md](WEBPHONE.md)를 참조한다.
+웹 화면의 SIP.js → 동일 Origin `/sip` 프록시 → Asterisk PJSIP WebSocket으로 SIP 신호를 전달한다. 음성은 WebRTC ICE/DTLS-SRTP로 직접 호스트 UDP 포트를 통해 Asterisk에 도착한다. 내선 1003은 webphone 컨텍스트의 9998만 사용한다. 9998은 RX 마이크 STT이다. 상세 설정과 검증은 [WEBPHONE.md](WEBPHONE.md)를 참조한다.
