@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 import logging
+import json
 import math
 import os
 from pathlib import Path
@@ -119,7 +120,9 @@ class Audio:
                 if not final:
                     session.observe(samples)
                 for event in await self.infer(session.pipeline.feed, np.empty(0, dtype=np.float32) if final else samples, final):
-                    await self.hub.publish(event)
+                    log.info('STT_RESULT %s', json.dumps(event, ensure_ascii=False))
+                    if event['type'] == 'final':
+                        await self.hub.publish(event)
                 if final:
                     break
         except Exception:

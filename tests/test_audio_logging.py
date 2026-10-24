@@ -46,3 +46,33 @@ class AudioMonitorTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('final=False', logs.output[0])
         self.assertIn('state=no_input', logs.output[0])
         self.assertIn('final=True', logs.output[1])
+
+
+class RecognitionLoggingTests(unittest.IsolatedAsyncioTestCase):
+    async def test_partials_logged_but_only_finals_published_including_flush(self):
+        from unittest.mock import AsyncMock
+        from app.main import Hub
+        import json
+
+        s = session()
+        s.pipeline.feed = lambda *args: None
+        s.queue.put_nowait(np.zeros(160, dtype=np.float32))
+        s.queue.put_nowait(None)
+        base = dict(call_id='test-call', speaker='customer', segment_id=0)
+        events = [dict(base, type='partial', text='안녕', engine='zipformer'),
+                  dict(base, type='partial', text='안녕하세요', engine='sensevoice-fallback'),
+                  dict(base, type='final', text='안녕하세요')]
+        flushed = dict(base, segment_id=1, type='final', text='감사합니다')
+        hub = Hub()
+        client = asyncio.Queue()
+        hub.clients.add(client)
+        audio = Audio(None, None, hub)
+        audio.infer = AsyncMock(side_effect=[events, [flushed]])
+        with self.assertLogs('app.main', level='INFO') as logs:
+            await audio.worker(s)
+        recorded = [json.loads(line.split('STT_RESULT ', 1)[1]) for line in logs.output]
+        self.assertEqual(recorded, events + [flushed])
+        self.assertEqual([e['text'] for e in hub.history], ['안녕하세요', '감사합니다'])
+        self.assertTrue(all(e['type'] == 'final' for e in hub.history))
+        self.assertEqual(client.qsize(), 2)
+        self.assertTrue(audio.infer.call_args.args[-1])

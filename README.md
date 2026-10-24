@@ -1,33 +1,51 @@
-# Asterisk Integration
+# STT Integration
 
 ## 1. 프로젝트 개요
 
-Asterisk와 STT·TTS 모델, 챗봇을 연결하는 음성 AI 연동 예제 프로젝트입니다.  
-전화 음성을 텍스트로 변환하고, 챗봇의 응답을 합성 음성으로 전달하는 구성을 목표로 합니다.  
-현재 Asterisk–STT와 웹 소프트폰·실시간 자막을 구현했으며, 챗봇·TTS 연동은 확장 예정입니다.
+고객의 전화 음성을 텍스트로 변환하여 웹 페이지에 실시간으로 출력하는 STT(Speech-to-Text) 연동 모듈을 구현하는 프로젝트입니다.
+
+Asterisk에서 통화 음성을 수집하고, STT 모델로 인식한 내용을 WebSocket을 통해 웹 페이지에 전달합니다. 사용자는 통화 중 고객의 발화 내용을 실시간 자막으로 확인할 수 있습니다.
+
+주요 기능은 다음과 같습니다.
+
+- Asterisk의 ARI와 ExternalMedia를 이용한 통화 음성 수집
+- Zipformer를 이용한 중간 인식과 Silero VAD·SenseVoice를 이용한 발화 감지 및 최종 인식
+- WebSocket을 통한 최종 인식 결과 전송과 웹 페이지의 확정 자막 표시
+- 브라우저 기반 웹 소프트폰을 통한 통화 및 음성 인식 확인
 
 ## 2. 아키텍처 구성도
 
 ```mermaid
-flowchart LR
-    Phone["웹 소프트폰 / SIP 단말"] <-->|"통화 음성"| PBX["Asterisk"]
-    Browser["웹 브라우저"] <-->|"SIP over WebSocket /sip"| API["FastAPI 서버"]
-    API <-->|"SIP 프록시 / ARI 통화 제어"| PBX
-    PBX -->|"snoopChannel + ExternalMedia / RTP"| Audio["PCMU 디코딩 / 8→16kHz 변환"]
-    subgraph STT["STT 처리 · sherpa-onnx"]
-        Audio --> Zipformer["Zipformer · 중간 인식"]
-        Audio --> VAD["Silero VAD · 발화 감지"]
-        VAD --> SenseVoice["SenseVoice INT8 · 최종 인식 / 감정 추정"]
-    end
-    Zipformer --> API
-    SenseVoice --> API
-    API -->|"WebSocket /ws · 실시간 자막"| Browser
-    API -.->|"인식 텍스트 · 확장 예정"| Bot["챗봇"]
-    Bot -.->|"응답 텍스트"| TTS["TTS 모델"]
-    TTS -.->|"합성 음성 · 확장 예정"| PBX
+graph LR
+    Browser[브라우저 SIP.js]
+    API[STT 서버 FastAPI]
+    Asterisk[Asterisk PJSIP ARI]
+    RTP[RTP PCMU 8 kHz]
+    Decode[파싱 및 μ-law 디코딩]
+    Resample[16 kHz 리샘플링]
+    Zipformer[Zipformer 중간 인식]
+    VAD[Silero VAD 발화 검출]
+    SenseVoice[SenseVoice 보완 및 최종 인식]
+    UI[실시간 자막]
+
+    Browser -->|SIP WebSocket| API
+    API -->|SIP 프록시| Asterisk
+    Browser -->|WebRTC 음성| Asterisk
+    Asterisk -->|ARI 통화 이벤트| API
+    Asterisk -->|RX snoop ExternalMedia| RTP
+    RTP --> Decode
+    Decode --> Resample
+    Resample --> Zipformer
+    Resample --> VAD
+    VAD --> SenseVoice
+    Zipformer -. 결과 없을 때 .-> SenseVoice
+    Zipformer -->|partial| API
+    SenseVoice -->|partial 및 final| API
+    API -->|partial 및 final| Logs[서버 로그]
+    API -->|WebSocket ws · final| UI
 ```
 
-실선은 현재 구현된 경로, 점선은 챗봇·TTS 확장 경로입니다. 웹 소프트폰은 브라우저에서 SIP.js로 동작하며, 음성은 WebRTC로 Asterisk에 전달합니다. Zipformer의 중간 인식 결과가 없으면 SenseVoice가 보완합니다.
+통화 음성은 PCMU 디코딩과 16 kHz 리샘플링을 거쳐 STT 모델로 전달됩니다. 중간 인식 과정은 내부에서 유지하며, 중간·최종 인식 결과는 서버 로그에 기록합니다. 웹 페이지에는 발화 종료 후 최종 인식 결과(`final`)만 WebSocket(`/ws`)을 통해 표시합니다.
 
 ## 3. 프로젝트 빌드 및 실행 방법
 
@@ -36,6 +54,22 @@ flowchart LR
 - Docker Engine 또는 Docker Desktop과 Docker Compose
 - Python 3.11 이상
 - 모델·이미지 다운로드를 위한 인터넷 연결 및 여유 디스크 약 3GB 이상
+
+### STT 모델 다운로드
+
+모델 파일은 [sherpa-onnx ASR 모델 배포 페이지](https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models)에서 제공합니다. 현재 코드가 사용하는 파일은 다음과 같습니다.
+
+- [한국어 Zipformer 스트리밍 모델](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-korean-2024-06-16.tar.bz2)
+- [SenseVoice INT8 모델](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.tar.bz2)
+- [Silero VAD 모델](https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx)
+
+프로젝트 루트에서 아래 명령을 실행하면 `models/`에 모델을 내려받고 로컬 SHA256 manifest를 생성합니다.
+
+```sh
+python3 scripts/download_models.py
+```
+
+다운로드한 파일은 Git에 포함되지 않습니다. 설치 후 무결성은 `python3 scripts/download_models.py --verify`로 확인할 수 있습니다.
 
 ### 최초 빌드 및 실행
 
@@ -62,7 +96,7 @@ cd ~/workspaces/Asterisk-Integration
 docker compose ps
 curl -f http://localhost:8000/health/ready
 
-# STT 서버 로그 확인
+# STT 서버 로그 확인 (STT_AUDIO: 음성 수신 상태, STT_RESULT: 중간·최종 인식 결과)
 docker compose logs -f stt
 
 # 종료
@@ -85,3 +119,5 @@ docker compose up -d --force-recreate --wait
 npm --prefix web ci
 npm --prefix web run build
 ```
+
+인식 결과는 `STT_RESULT` 로그에 JSON으로 기록되며, `call_id`, `speaker`, `segment_id`, `type`, `text`로 통화·화자·발화별 과정을 확인할 수 있습니다. 중간 결과에는 사용한 엔진이, 최종 결과에는 감정·음향 이벤트와 추론 시간이 포함됩니다. 통화 종료 시 남은 음성의 최종 인식 결과도 같은 방식으로 기록하고 표시합니다.

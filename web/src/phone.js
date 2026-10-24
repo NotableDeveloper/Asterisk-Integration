@@ -39,7 +39,7 @@ async function initializeMicrophone() {
   navigator.mediaDevices?.addEventListener('devicechange', refreshMicrophoneDevices);
   await refreshMicrophoneDevices();
 }
-function status(text) { el('phone-status').textContent = text; }
+function status(text) { el('notice').textContent = text; }
 function render() {
   const registration = registered ? '등록됨 · 내선 1003' : busy ? '등록 중…' : '미등록';
   el('sip-connection-state').textContent = registration;
@@ -69,7 +69,7 @@ async function dispose() {
 }
 async function register() {
   if (registered || busy || calling || !['http:', 'https:'].includes(location.protocol)) return;
-  busy = true; render(); status('SIP 등록 중…');
+  busy = true; render();
   try {
     await dispose();
     const instance = new Web.SimpleUser(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/sip`, {
@@ -84,26 +84,26 @@ async function register() {
         }
       },
       delegate: {
-        onRegistered() { registered = true; busy = false; status('SIP 등록 완료 · 내선 1003'); render(); },
+        onRegistered() { registered = true; busy = false; render(); },
         onUnregistered() { registered = false; render(); },
         onServerDisconnect() {
           registered = false; calling = false; busy = false;
-          status('SIP 연결 종료 · 화면을 새로고침하세요.'); render();
+          status('SIP 연결이 종료됐습니다. 화면을 새로고침하세요.'); render();
         },
         onCallCreated() { calling = true; render(); },
         onCallAnswered() {
-          busy = false; status('통화 연결됨 · 마이크로 말씀하세요.'); render();
+          busy = false; render();
           refreshMicrophoneDevices();
-          el('phone-audio').play().catch(() => status('통화 연결됨 · 대화록 아래 재생 버튼을 눌러 음성을 들으세요.'));
+          el('phone-audio').play().catch(() => status('통화 음성을 재생할 수 없습니다. 아래 재생 버튼을 확인하세요.'));
         },
-        onCallHangup() { calling = false; busy = false; status(registered ? '통화 종료 · 발신 대기' : '통화 종료'); render(); },
+        onCallHangup() { calling = false; busy = false; render(); },
         onCallReceived() { instance.decline().catch(failure); }
       }
     });
     phone = instance;
     await instance.connect();
     await instance.register({requestDelegate: {
-      onReject(response) { busy = false; registered = false; status(`SIP 등록 실패 (${response.message.statusCode}) · 서버의 SIP 계정 설정을 확인한 후 새로고침하세요.`); render(); }
+      onReject(response) { busy = false; registered = false; status(`SIP 등록 실패 (${response.message.statusCode}). 서버 설정을 확인한 후 새로고침하세요.`); render(); }
     }});
   } catch (error) { await dispose(); busy = false; failure(error); render(); }
 }
@@ -113,7 +113,7 @@ async function call() {
     status('마이크 통화는 localhost 또는 HTTPS에서 지원됩니다.'); return;
   }
   microphoneError = '';
-  busy = true; render(); status('마이크 권한 확인 및 발신 중…');
+  busy = true; render();
   try {
     await phone.call('sip:9998@asterisk', undefined, {
       requestDelegate: {onReject(response) { status(`발신 거절 (${response.message.statusCode})`); }}

@@ -81,7 +81,7 @@ test('shows the actual call track, mute and disconnect states, and clears on han
 test('registration rejection keeps calling disabled and explains recovery', async () => {
   const app = await setup({reject: true});
   assert.equal(app.elements['microphone-call'].disabled, true);
-  assert.match(app.elements['phone-status'].textContent, /새로고침/);
+  assert.match(app.elements['notice'].textContent, /새로고침/);
   assert.equal(app.registrations, 1);
 });
 
