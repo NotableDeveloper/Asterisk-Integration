@@ -1,8 +1,0 @@
-{"type": "call_started", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "id": 15, "time": 1792418596.474589}
-{"type": "partial", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "speaker": "customer", "segment_id": 0, "text": "조금만 생각.", "engine": "sensevoice-fallback", "id": 16, "time": 1792418600.788848}
-{"type": "partial", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "speaker": "customer", "segment_id": 0, "text": "조금만 생각을 하면서 살면.", "engine": "sensevoice-fallback", "id": 17, "time": 1792418601.7985628}
-{"type": "partial", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "speaker": "customer", "segment_id": 0, "text": "조금만 생각을 하면서 살면 훨씬 편할거야.", "engine": "sensevoice-fallback", "id": 18, "time": 1792418602.75485}
-{"type": "final", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "speaker": "customer", "segment_id": 0, "text": "생각 을 하 면서 살 면 훨씬 편할 거야.", "emotion": "NEUTRAL", "acoustic_event": "Speech", "final_inference_ms": 67.0, "id": 19, "time": 1792418603.3209512}
-{"type": "metrics", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "speaker": "customer", "packets": 505, "malformed": 0, "late": 0, "lost": 0, "overflow": 0, "audio_seconds": 10.1, "inference_seconds": 1.401, "rtf": 0.139, "id": 20, "time": 1792418606.6328156}
-{"type": "call_ended", "call_id": "demo-7148b392a3dc470d9b46d51e056254ef", "id": 21, "time": 1792418606.6328242}
-{"result": "PASS", "elapsed_seconds": 10.16, "final_segments": 1}
