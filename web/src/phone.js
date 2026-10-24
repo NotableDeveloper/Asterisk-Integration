@@ -75,7 +75,7 @@ async function register() {
     const instance = new Web.SimpleUser(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/sip`, {
       aor: 'sip:1003@asterisk',
       reconnectionAttempts: 0,
-      media: {constraints: {audio: true, video: false}, remote: {audio: el('phone-audio')}},
+      media: {constraints: {audio: true, video: false}},
       userAgentOptions: {
         authorizationUsername: '1003', authorizationPassword: 'demo-web-1003',
         logLevel: 'error',
@@ -94,7 +94,6 @@ async function register() {
         onCallAnswered() {
           busy = false; render();
           refreshMicrophoneDevices();
-          el('phone-audio').play().catch(() => status('통화 음성을 재생할 수 없습니다. 아래 재생 버튼을 확인하세요.'));
         },
         onCallHangup() { calling = false; busy = false; render(); },
         onCallReceived() { instance.decline().catch(failure); }

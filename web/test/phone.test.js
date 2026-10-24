@@ -16,11 +16,11 @@ test('page loads the current bundle through a content-versioned URL', () => {
 
 async function setup({secure = true, permission = 'prompt', reject = false} = {}) {
   const elements = Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(([, id]) =>
-    [id, {textContent: '', value: 'test', play: async () => {}}]));
+    [id, {textContent: '', value: 'test'}]));
   const intervals = [];
   let instance, permissionRequests = 0, registrations = 0;
   class SimpleUser {
-    constructor(url, options) { this.delegate = options.delegate; instance = this; }
+    constructor(url, options) { this.delegate = options.delegate; this.media = options.media; instance = this; }
     async connect() {}
     async register(options) {
       registrations++;
@@ -56,6 +56,9 @@ async function setup({secure = true, permission = 'prompt', reject = false} = {}
 
 test('loads with automatic SIP registration, without opening the microphone', async () => {
   const app = await setup();
+  assert.equal(app.instance.media.constraints.audio, true);
+  assert.equal(app.instance.media.remote, undefined);
+  assert.equal(app.elements['phone-audio'], undefined);
   assert.equal(app.registrations, 1);
   assert.equal(app.permissionRequests, 0);
   assert.equal(app.elements['microphone-call'].disabled, false);
