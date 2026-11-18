@@ -1,0 +1,12 @@
+.env
+/docs/
+.idea/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+models/
+.venv/
+node_modules/
+dist/
+test-results/
+playwright-report/

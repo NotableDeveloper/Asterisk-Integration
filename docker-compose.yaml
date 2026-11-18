@@ -1,0 +1,47 @@
+name: fast-contact-router
+
+services:
+  asterisk:
+    build: ./asterisk
+    environment:
+      ARI_PASSWORD: ${ARI_PASSWORD:?Run python3 scripts/init_env.py first}
+      SIP_PASSWORD: ${SIP_PASSWORD:?Run python3 scripts/init_env.py first}
+    ports:
+      - "127.0.0.1:5060:5060/udp"
+      - "127.0.0.1:8088:8088"
+      - "127.0.0.1:10000-10019:10000-10019/udp"
+    volumes:
+      - asterisk_data:/var/lib/asterisk
+      - asterisk_spool:/var/spool/asterisk
+    healthcheck:
+      test: ["CMD", "asterisk", "-rx", "core show uptime"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+  whisper:
+    build: ./whisper
+    environment:
+      HF_HUB_DISABLE_XET: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - whisper_models:/models
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      start_period: 15m
+      retries: 6
+    restart: unless-stopped
+
+volumes:
+  asterisk_data:
+  asterisk_spool:
+  whisper_models:
