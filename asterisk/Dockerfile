@@ -8,6 +8,7 @@ RUN printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d \
     && rm -rf /var/lib/apt/lists/*
 
 COPY config/ /etc/asterisk/
+COPY sounds/*.wav /usr/share/asterisk/sounds/fcr/
 COPY templates/ /opt/asterisk-templates/
 COPY entrypoint.sh /usr/local/bin/asterisk-entrypoint
 RUN chmod +x /usr/local/bin/asterisk-entrypoint
