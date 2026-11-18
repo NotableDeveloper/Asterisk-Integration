@@ -20,6 +20,22 @@ services:
       retries: 6
     restart: unless-stopped
 
+  webphone:
+    build: ./webphone
+    environment:
+      SIP_PASSWORD: ${SIP_PASSWORD:?Run python3 scripts/init_env.py first}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      asterisk:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
   whisper:
     build: ./whisper
     environment:

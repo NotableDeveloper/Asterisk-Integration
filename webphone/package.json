@@ -1,0 +1,17 @@
+{
+  "name": "fast-contact-router-webphone",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/app.js --bundle --format=esm --outfile=dist/app.js && cp src/index.html src/style.css dist/",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "sip.js": "0.21.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "esbuild": "0.28.2"
+  }
+}

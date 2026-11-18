@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fast Contact Router · 로컬 소프트폰</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <a class="brand" href="/" aria-label="Fast Contact Router 홈"><span class="brand-mark" aria-hidden="true">↗</span> Fast Contact Router</a>
+      <span class="environment"><span aria-hidden="true"></span> LOCAL</span>
+    </header>
+    <section class="intro" aria-labelledby="title">
+      <p class="eyebrow">BROWSER SOFTPHONE</p>
+      <h1 id="title">직접 말하고,<br>통화 흐름을 확인하세요.</h1>
+      <p>전화기를 연결하고 마이크를 허용하면 바로 시험할 수 있습니다.<br class="desktop-break"> 처음이라면 에코 테스트로 소리가 잘 들리는지 확인해 보세요.</p>
+    </section>
+    <div class="workspace">
+      <section class="phone panel" aria-labelledby="phone-title">
+        <div class="panel-heading"><h2 id="phone-title">내 전화기 <span>1002</span></h2><span id="status" class="status" data-state="offline" role="status" aria-live="polite">연결 전</span></div>
+        <div class="call-display">
+          <div id="call-icon" class="call-icon" aria-hidden="true">↗</div>
+          <p id="call-label">통화 준비</p>
+          <p id="call-description">아래 버튼으로 전화기를 연결해 주세요.</p>
+          <output id="duration" aria-label="통화 시간">00:00</output>
+        </div>
+        <button id="connect" class="button button-connect" type="button">전화기 연결</button>
+        <div id="error" class="error" role="alert" hidden></div>
+        <div class="destinations" aria-label="통화 대상">
+          <button id="call-router" class="destination primary" type="button" disabled><span><strong>문의 안내 테스트</strong><small>안내를 듣고 제품과 문의를 말해 보세요.</small></span><span class="extension">7000 ↗</span></button>
+          <button id="call-echo" class="destination" type="button" disabled><span><strong>에코 테스트</strong><small>내 목소리가 되돌아오는지 확인합니다.</small></span><span class="extension">600 ↗</span></button>
+        </div>
+        <div class="call-controls">
+          <button id="mute" class="button button-secondary" type="button" aria-pressed="false" disabled>마이크 끄기</button>
+          <button id="hangup" class="button button-hangup" type="button" disabled>통화 종료</button>
+        </div>
+        <div class="audio-controls">
+          <div class="microphone"><span>마이크 입력</span><meter id="mic-level" min="0" max="1" value="0" aria-label="마이크 입력 크기"></meter></div>
+          <label class="volume">수신 음량<input id="volume" type="range" min="0" max="1" value="0.8" step="0.05" aria-label="수신 음량"></label>
+        </div>
+        <audio id="remote-audio" autoplay></audio>
+      </section>
+      <aside class="side-panel">
+        <section class="guide panel" aria-labelledby="guide-title">
+          <p class="eyebrow">TRY A CONVERSATION</p><h2 id="guide-title">이렇게 시험해 보세요</h2>
+          <ol>
+            <li><span>01</span><div><strong>전화기를 연결하세요</strong><p>연결되면 통화 버튼이 활성화됩니다.</p></div></li>
+            <li><span>02</span><div><strong>안내가 끝나면 말해 주세요</strong><p>“세탁기가 탈수를 못 해서 수리를 받고 싶어요.”</p></div></li>
+            <li><span>03</span><div><strong>3초 동안 잠시 멈춰 보세요</strong><p>문의 내용을 바탕으로 상담사를 연결한다는 안내가 나옵니다.</p></div></li>
+          </ol>
+          <p class="scope-note">현재는 안내 흐름 확인용입니다. 두 번째 안내가 끝나면 통화가 종료되며, 실제 상담사 연결은 아직 제공하지 않습니다.</p>
+        </section>
+        <section class="activity panel" aria-labelledby="activity-title"><div class="panel-heading"><h2 id="activity-title">통화 기록</h2><span class="subtle">이 화면에서만 보관</span></div><ol id="events" aria-live="polite"><li class="empty">전화기를 연결하면 상태가 표시됩니다.</li></ol></section>
+      </aside>
+    </div>
+    <footer>마이크 권한이 필요합니다. 소리가 겹치면 헤드셋을 사용해 주세요.</footer>
+  </main>
+</body>
+</html>

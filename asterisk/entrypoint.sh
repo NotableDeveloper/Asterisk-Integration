@@ -9,8 +9,10 @@ for credential in "${ARI_PASSWORD:?ARI_PASSWORD is required}" "${SIP_PASSWORD:?S
     [ "${#credential}" -ge 24 ] || { echo 'Passwords must have at least 24 characters.' >&2; exit 1; }
 done
 
+ASTERISK_CONTAINER_IP=$(hostname -i | awk '{print $1}')
+export ASTERISK_CONTAINER_IP
 for name in ari pjsip rtp; do
-    envsubst '${ARI_PASSWORD} ${SIP_PASSWORD}' < "/opt/asterisk-templates/$name.conf" > "/etc/asterisk/$name.conf"
+    envsubst '${ARI_PASSWORD} ${SIP_PASSWORD} ${ASTERISK_CONTAINER_IP}' < "/opt/asterisk-templates/$name.conf" > "/etc/asterisk/$name.conf"
     chown root:asterisk "/etc/asterisk/$name.conf"
     chmod 640 "/etc/asterisk/$name.conf"
 done
