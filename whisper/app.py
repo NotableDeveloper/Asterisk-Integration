@@ -1,7 +1,9 @@
 """Local single-model CPU transcription service; no VAD or routing logic."""
 
 import asyncio
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
+from pathlib import Path
+import re
 import io
 import logging
 import time
@@ -17,6 +19,8 @@ MODEL_ID = "Systran/faster-whisper-small"
 MODEL_REVISION = "536b0662742c02347bc0e980a01041f333bce120"
 MAX_BYTES = 16 * 1024 * 1024
 MAX_SECONDS = 120
+INQUIRIES = Path("/inquiries")
+RESULT_TTL = 300
 logger = logging.getLogger("uvicorn.error")
 
 
@@ -34,8 +38,15 @@ async def lifespan(app: FastAPI):
     )
     app.state.inference_lock = asyncio.Lock()
     logger.info("Whisper model ready")
-    yield
-    del app.state.model
+    app.state.results = {}
+    worker = asyncio.create_task(process_inquiries(app))
+    try:
+        yield
+    finally:
+        worker.cancel()
+        with suppress(asyncio.CancelledError):
+            await worker
+        del app.state.model
 
 
 app = FastAPI(title="Fast Contact Router — Whisper", lifespan=lifespan)
@@ -49,7 +60,7 @@ async def health():
     }
 
 
-def validate_wav(audio: bytes) -> float:
+def validate_wav(audio: bytes, max_seconds: int = MAX_SECONDS) -> float:
     try:
         with wave.open(io.BytesIO(audio), "rb") as file:
             if file.getsampwidth() != 2 or file.getnchannels() not in (1, 2):
@@ -57,8 +68,8 @@ def validate_wav(audio: bytes) -> float:
             if not 8000 <= file.getframerate() <= 48000:
                 raise HTTPException(422, "WAV sample rate must be 8000–48000 Hz")
             duration = file.getnframes() / file.getframerate()
-            if not 0 < duration <= MAX_SECONDS:
-                raise HTTPException(422, "WAV duration must be greater than 0 and at most 120 seconds")
+            if not 0 < duration <= max_seconds:
+                raise HTTPException(422, f"WAV duration must be greater than 0 and at most {max_seconds} seconds")
             expected = file.getnframes() * file.getnchannels() * file.getsampwidth()
             if len(file.readframes(file.getnframes())) != expected:
                 raise HTTPException(422, "Truncated WAV data")
@@ -98,3 +109,42 @@ async def transcribe_audio(request: Request):
             # Do not include customer text/audio in logs or API errors.
             logger.error("Whisper inference failed (%s)", type(error).__name__)
             raise HTTPException(500, "Transcription failed") from error
+
+
+def transcribe_recording(model, path):
+    audio = path.read_bytes()
+    # The recording includes the initial 30s wait and the 120s speech window.
+    duration = validate_wav(audio, max_seconds=152)
+    return transcribe(model, audio, duration)
+
+
+async def process_inquiries(app):
+    while True:
+        for key, (expires, _) in list(app.state.results.items()):
+            if expires <= time.monotonic():
+                del app.state.results[key]
+        for path in sorted(INQUIRIES.glob("ready-*.wav"), key=lambda p: p.stat().st_mtime):
+            key = path.name.split("-", 2)[1]
+            try:
+                async with app.state.inference_lock:
+                    result = await run_in_threadpool(transcribe_recording, app.state.model, path)
+                payload = {"status": "done", **result}
+            except Exception:
+                logger.exception("Call recording transcription failed")
+                payload = {"status": "failed"}
+            if key != "internal":
+                app.state.results[key] = (time.monotonic() + RESULT_TTL, payload)
+            path.unlink(missing_ok=True)
+        await asyncio.sleep(0.5)
+
+
+@app.get("/inquiries/{key}")
+async def inquiry_result(key: str):
+    if not re.fullmatch(r"[0-9a-f]{32}", key):
+        raise HTTPException(404)
+    entry = app.state.results.get(key)
+    if entry and entry[0] > time.monotonic():
+        return entry[1]
+    if any(INQUIRIES.glob(f"ready-{key}-*.wav")):
+        return {"status": "processing"}
+    raise HTTPException(404)

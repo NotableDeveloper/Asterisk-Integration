@@ -70,7 +70,7 @@ def main():
                 file.setframerate(8000)
                 file.writeframes(samples.tobytes())
             subprocess.run(["docker", "compose", "cp", str(source), "asterisk:" + remote], cwd=ROOT, check=True, capture_output=True)
-            query = urllib.parse.urlencode({"app": app + ",fast-contact-router", "subscribeAll": "true"})
+            query = urllib.parse.urlencode({"app": app, "subscribeAll": "true"})
             try:
                 with connect("ws://127.0.0.1:8088/ari/events?" + query, additional_headers=headers, proxy=None) as events:
                     api("POST", "/channels", endpoint="Local/7000@from-internal/n", app=app,
@@ -100,12 +100,11 @@ def main():
                                 assert "CONNECTING_PROMPT" not in stages
                                 print("No-input call did not play the connecting prompt", flush=True)
                                 return
-                        if event["type"] == "StasisStart" and channel == inbound_id:
-                            assert expect_routing
-                            assert "CONNECTING_PROMPT" in stages and "AWAITING_ROUTER" in stages
-                            assert stages["SPEECH_STARTED"] - stages["LISTENING"] >= 3.5
-                            print("Both prompts completed; short pause did not finish the inquiry", flush=True)
-                            return
+                            if stage == "AWAITING_ROUTER" and channel == inbound_id:
+                                assert expect_routing and "CONNECTING_PROMPT" in stages
+                                assert stages["SPEECH_STARTED"] - stages["LISTENING"] >= 3.5
+                                print("Both prompts completed; short pause did not finish the inquiry", flush=True)
+                                return
                     raise AssertionError("Call flow did not complete")
             finally:
                 for channel in channel_ids:

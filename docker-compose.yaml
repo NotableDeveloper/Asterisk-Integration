@@ -11,6 +11,7 @@ services:
       - "127.0.0.1:8088:8088"
       - "127.0.0.1:10000-10019:10000-10019/udp"
     volumes:
+      - inquiries:/inquiries
       - asterisk_data:/var/lib/asterisk
       - asterisk_spool:/var/spool/asterisk
     healthcheck:
@@ -44,6 +45,7 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
+      - inquiries:/inquiries
       - whisper_models:/models
     healthcheck:
       test:
@@ -58,6 +60,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  inquiries:
   asterisk_data:
   asterisk_spool:
   whisper_models:

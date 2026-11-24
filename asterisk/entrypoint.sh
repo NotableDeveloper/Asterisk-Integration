@@ -16,6 +16,9 @@ for name in ari pjsip rtp; do
     chown root:asterisk "/etc/asterisk/$name.conf"
     chmod 640 "/etc/asterisk/$name.conf"
 done
+# Setgid lets the Whisper service read completed recordings and dequeue them.
+install -d -o asterisk -g 10001 -m 2770 /inquiries
+find /inquiries -maxdepth 1 -type f -name 'open-*.wav' -delete
 mkdir -p /var/run/asterisk
 chown -R asterisk:asterisk /var/run/asterisk /var/log/asterisk /var/spool/asterisk /var/lib/asterisk
 exec asterisk -f -U asterisk -G asterisk
