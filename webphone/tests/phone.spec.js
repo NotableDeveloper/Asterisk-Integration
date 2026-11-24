@@ -40,9 +40,9 @@ test("initial controls and mobile layout", async ({ page }) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test("registration, two-way echo audio, mute and hangup", async ({ page }) => {
+test("inquiry registration, audio, mute and hangup", async ({ page }) => {
   await register(page);
-  await page.locator("#call-echo").click();
+  await page.locator("#call-router").click();
   await expect(page.locator("#status")).toHaveText("통화 중");
   await expect.poll(async () => {
     const stats = await mediaStats(page);
@@ -102,7 +102,7 @@ test("cancel while microphone access is pending", async ({ page, context }) => {
   });
   await page.reload();
   await register(page);
-  await page.locator("#call-echo").click();
+  await page.locator("#call-router").click();
   await expect.poll(() => page.evaluate(() => Boolean(window.__allowTestMicrophone))).toBe(true);
   await page.locator("#hangup").click();
   await page.evaluate(() => window.__allowTestMicrophone());
