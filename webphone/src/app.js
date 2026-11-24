@@ -18,8 +18,12 @@ function record(message) {
   list.querySelector(".empty")?.remove();
   const item = document.createElement("li");
   const time = document.createElement("time");
-  time.dateTime = new Date().toISOString();
-  time.textContent = new Date().toLocaleTimeString("ko-KR", { hour12: false });
+  const now = new Date();
+  const pad = value => String(value).padStart(2, "0");
+  time.dateTime = now.toISOString();
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const clock = `${pad(now.getHours() % 12 || 12)}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  time.textContent = `${date} ${clock}`;
   const text = document.createElement("span");
   text.textContent = message;
   item.append(time, text);
@@ -37,7 +41,8 @@ function render() {
   const ready = state.registration === "ready";
   const status = calling ? state.call : state.registration;
   $("status").dataset.state = status;
-  $("status").textContent = ({ offline: "연결 전", connecting: "연결 중", ready: "연결됨", dialing: "발신 중", active: "통화 중", ending: "종료 중" })[status];
+  $("status").hidden = status === "offline";
+  $("status").textContent = ({ offline: "", connecting: "연결 중", ready: "연결됨", dialing: "발신 중", active: "통화 중", ending: "종료 중" })[status];
   $("connect").textContent = ready ? "전화기 연결 해제" : state.registration === "connecting" ? "전화기 연결 중…" : "전화기 연결";
   $("connect").disabled = state.registration === "connecting" || calling;
   $("call-router").disabled = !ready || calling;
@@ -133,7 +138,7 @@ $("connect").addEventListener("click", async () => {
           if (user !== current) return;
           clearTimeout(registrationTimer);
           state.registration = "ready";
-          record("전화기가 연결되었습니다. 내선 1002");
+          record("전화기가 연결되었습니다.");
           render();
         },
         onUnregistered() {

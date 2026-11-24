@@ -144,13 +144,8 @@ h2 {
   margin: 0;
   font-weight: 650;
 }
-.panel-heading h2 span {
-  margin-left: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 400;
-}
 .status {
+  margin-left: auto;
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 20px;
@@ -385,6 +380,7 @@ input[type=range] {
   border: 0;
 }
 .activity time {
+  white-space: nowrap;
   color: #8a948b;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
