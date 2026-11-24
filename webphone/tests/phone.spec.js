@@ -65,11 +65,24 @@ test("inquiry prompt, caller audio, silence and remote hangup", async ({ page })
   await page.locator("#call-router").click();
   await expect(page.locator("#status")).toHaveText("통화 중");
   await expect.poll(async () => (await mediaStats(page)).energy).toBeGreaterThan(0);
-  // Greeting is 6.963s. Leave time for the synthetic caller to speak afterward.
-  await page.waitForTimeout(8500);
-  await page.locator("#mute").click();
-  await expect(page.locator("#status")).toHaveText("연결됨", { timeout: 18000 });
+  // The fixture speaks a Korean repair inquiry, then falls silent.
+  await expect(page.locator("#status")).toHaveText("연결됨", { timeout: 30000 });
   await expect(page.locator("#events")).toContainText("통화가 종료되었습니다.");
+  const transcript = page.locator("#transcript");
+  await expect(transcript).toContainText("세탁기");
+  await expect(transcript).toContainText("수리");
+  await expect(transcript).not.toContainText("상담사");
+});
+
+test("hanging up during speech discards the partial inquiry", async ({ page }) => {
+  await register(page);
+  await page.locator("#call-router").click();
+  await expect(page.locator("#status")).toHaveText("통화 중");
+  // The greeting is 6.963s and the microphone starts its inquiry at 8s.
+  await page.waitForTimeout(8800);
+  await page.locator("#hangup").click();
+  await expect(page.locator("#status")).toHaveText("연결됨");
+  await expect(page.locator("#transcript")).toContainText("완료된 녹음이 없습니다");
 });
 
 test("microphone denial is recoverable", async ({ page, context }) => {

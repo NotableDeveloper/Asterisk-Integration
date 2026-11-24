@@ -3,6 +3,7 @@ import { SimpleUser } from "sip.js/lib/platform/web/index.js";
 const $ = (id) => document.getElementById(id);
 const state = { registration: "offline", call: "idle", muted: false };
 let user;
+let inquiryKey;
 let audioContext;
 let meterSource;
 let meterFrame;
@@ -63,7 +64,10 @@ function ended() {
   state.muted = false;
   stopMediaDisplay();
   render();
-  if (wasCalling) record("통화가 종료되었습니다.");
+  if (wasCalling) {
+    record("통화가 종료되었습니다.");
+    if (inquiryKey) void showTranscript(inquiryKey);
+  }
 }
 
 function startMediaDisplay() {
@@ -175,9 +179,44 @@ $("connect").addEventListener("click", async () => {
   }
 });
 
+async function showTranscript(key) {
+  const output = $("transcript");
+  output.textContent = "전사 결과를 확인하고 있습니다…";
+  for (let attempt = 0; attempt < 300 && key === inquiryKey; attempt++) {
+    try {
+      const response = await fetch(`/inquiries/${key}`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+      if (key !== inquiryKey) return;
+      if (response.status === 404 && attempt >= 2) {
+        output.textContent = "완료된 녹음이 없습니다. 첫 안내가 끝난 뒤 말하고 3초 동안 기다려 주세요.";
+        return;
+      }
+      if (response.ok) {
+        const result = await response.json();
+        if (key !== inquiryKey) return;
+        if (result.status === "done") {
+          output.textContent = result.text || "인식된 단어가 없습니다.";
+          return;
+        }
+        if (result.status === "failed") {
+          output.textContent = "녹음 전사에 실패했습니다. 다시 통화해 주세요.";
+          return;
+        }
+      } else if (response.status !== 404 && attempt >= 2) {
+        break;
+      }
+    } catch {
+      if (attempt >= 2) break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  if (key === inquiryKey) output.textContent = "전사 결과를 가져오지 못했습니다. Whisper 서비스 상태를 확인해 주세요.";
+}
+
 async function callInquiry() {
   if (state.registration !== "ready" || state.call !== "idle") return;
   showError();
+  inquiryKey = crypto.randomUUID().replaceAll("-", "");
+  $("transcript").textContent = "첫 안내가 끝나면 문의를 말씀해 주세요.";
   state.call = "dialing";
   render();
   record("7000에 전화합니다.");
@@ -185,7 +224,7 @@ async function callInquiry() {
     // Resume from the click gesture so the meter/audio can run under autoplay rules.
     audioContext ??= new AudioContext();
     await audioContext.resume();
-    await user.call("sip:7000@localhost");
+    await user.call("sip:7000@localhost", { extraHeaders: [`X-Inquiry-Key: ${inquiryKey}`] });
   } catch (error) {
     const message = error.name === "NotAllowedError" ? "마이크 권한이 거부되었습니다. 주소창의 사이트 설정에서 마이크를 허용해 주세요." : error.name === "NotFoundError" ? "사용할 마이크를 찾지 못했습니다. 마이크 연결을 확인해 주세요." : "통화를 시작하지 못했습니다. 마이크와 전화기 연결을 확인해 주세요.";
     showError(message);
